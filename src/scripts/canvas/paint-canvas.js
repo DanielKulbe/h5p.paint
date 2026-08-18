@@ -367,12 +367,29 @@ class PaintCanvas {
   exportPNG() {
     const width = this.baseWidth;
     const height = this.baseHeight;
+
+    // Save the responsive state.
+    const originalZoom = this.canvas.getZoom();
+    const originalWidth = this.canvas.getWidth();
+    const originalHeight = this.canvas.getHeight();
+
+    // Reset to defaults.
+    this.canvas.setZoom(1);
+    this.canvas.setDimensions({ width, height });
+    this.canvas.renderAll();
+
     let drawingLayer = null;
+
     try {
-      drawingLayer = this.canvas.toCanvasElement(1, { width, height });
+      drawingLayer = this.canvas.toCanvasElement(1);
     } catch (e) {
       // Ignore; merge canvas may still contain the background layer.
     }
+
+    // Restore responsive state.
+    this.canvas.setZoom(originalZoom);
+    this.canvas.setDimensions({ width: originalWidth, height: originalHeight });
+    this.canvas.renderAll();
 
     return compositeExportPng(
       width,
